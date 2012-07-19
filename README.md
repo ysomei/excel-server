@@ -1,4 +1,7 @@
 excel-server
 ============
 
-create excel data web-service
+'create excel file service' on
+
+  JRuby + Apache POI + sinatra + WEBrick
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Starting WebService on Rack!"
+./bin/jruby -S bundle exec ./bin/jruby ./jrackup.rb $@
