@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Starting jirb!"
+export PATH=$PWD/bin:$PATH
+./bin/jruby -S bundle exec ./bin/jirb --prompt default $@

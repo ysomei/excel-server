@@ -52,6 +52,26 @@ class ExcelWorkbook
     return DataFormatter.new.format_cell_value(cell)
   end
 
+  def wordwrap(row, col)
+    cellstyle = @book.create_cell_style
+    cellstyle.set_wrap_text(true)
+    
+    return false if (cell = get_cell(row, col)).nil?
+
+    cell.set_cell_style(cellstyle)
+    return true
+  end
+
+  def no_wordwrap(row, col)
+    cellstyle = @book.create_cell_style
+    cellstyle.set_wrap_text(false)
+    
+    return false if (cell = get_cell(row, col)).nil?
+
+    cell.set_cell_style(cellstyle)
+    return true
+  end
+
   def to_blob
     # use tempfile class
     tmp_io = Tempfile.open("excel_server_creating_excel_file_done_")
@@ -65,13 +85,37 @@ class ExcelWorkbook
     tmp_io.close(true)
     return blob
   end
+
+  def cloneSheet(index)
+    @book.cloneSheet(index)
+  end
+  def setSheetName(index, name)
+    @book.setSheetName(index, name)
+  end
+  def createSheet
+    @book.createSheet
+  end
+  def removeSheetAt(index)
+    @book.removeSheetAt(index)
+  end
+  def setActiveSheet(index)
+    @book.setActiveSheet(index)
+  end
+
+  private
+
+  def get_cell(row, col)
+    return nil if (row = @sheet.get_row(row)).nil?
+    return nil if (cell = row.get_cell(col)).nil?
+    return cell
+  end
 end
 
 =begin
 # ----
 # sample
 if __FILE__ == $0
-  excel_filename = "template_excel_file.xls"
+  excel_filename = "B_EstimateOrder.xls"
   filepath = File.expand_path("./", excel_filename)
   ExcelWorkbook.open(filepath) do |book|
   #book = ExcelWorkbook.new(filepath)

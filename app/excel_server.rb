@@ -30,10 +30,23 @@ class ExcelServer
       blob = "Hello"
       ExcelWorkbook.open(tmp_filepath) do |book|
         exceldatas.each do |idx, val|
-          book.select_sheet_at(idx.to_i)
-          val.each do |data|
-            row, col, val = data
-            book[row, col] = val
+          case idx.to_i
+          when -1
+            val.each do |data|
+              cmd, params = data
+              cmd.gsub!("@", "")
+              begin
+                book.send(cmd, *params)
+              rescue
+                p $!
+              end
+            end
+          else
+            book.select_sheet_at(idx.to_i)
+            val.each do |data|
+              row, col, val = data
+              book[row, col] = val
+            end
           end
         end
         blob = book.to_blob

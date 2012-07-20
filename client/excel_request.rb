@@ -5,7 +5,7 @@
 # code sample 
 #
 # ereq = ExcelRequest.new
-# templatefilepath = File.expand_path("./", "template_excel_file.xls")
+# filepath = File.expand_path("./", "B_EstimateOrder.xls")
 #
 # sheets = ExcelRequest::ExcelSheet.new
 # sheet = sheets[0]
@@ -14,7 +14,7 @@
 # sheet[4, 8] = "ほがー"
 #
 # write_filepath = File.expand_path("./", "newfile.xls")
-# ereq.get(templatefilepath, sheets, write_filepath)
+# ereq.get(filepath, sheets, write_filepath)
 #
 # => create 'newfile.xls' using ExcelServer using template_file
 # 
@@ -34,14 +34,44 @@ class ExcelRequest
     end
     def [](index)
       return @sheets[index] if @sheets.key?(index)
-      @sheets[index] = ExcelCell.new
+      return @sheets[index] = ExcelCell.new unless index < 0
+      raise ArgumentError.new("invalid index: #{index}")
     end
+
+    def cloneSheet(index, name = nil)
+      @sheets[-1] = Array.new unless @sheets.key?(-1)
+      @sheets[-1].push(["@cloneSheet", [index]])
+    end
+    def setSheetName(index, name)
+      @sheets[-1] = Array.new unless @sheets.key?(-1)
+      @sheets[-1].push(["@setSheetName", [index, name]])
+    end
+    def createSheet
+      @sheets[-1] = Array.new unless @sheets.key?(-1)
+      @sheets[-1].push(["@createSheet", []])
+    end
+    def removeSheetAt(index)
+      @sheets[-1] = Array.new unless @sheets.key?(-1)
+      @sheets[-1].push(["@removeSheetAt", [index]])
+    end
+    def setActiveSheet(index)
+      @sheets[-1] = Array.new unless @sheets.key?(-1)
+      @sheets[-1].push(["@setActiveSheet", [index]])
+    end
+
     def to_json
       newhash = {}
       @sheets.each do |idx, val|
         newhash[idx] = Array.new
-        val.cell.each do |k, v|
-          newhash[idx].push([k[0], k[1], v])
+        case val.class.to_s
+        when "ExcelRequest::ExcelCell"
+          val.cell.each do |k, v|
+            newhash[idx].push([k[0], k[1], v])
+          end
+        when "Array"
+          val.each do |v|
+            newhash[idx].push(v)
+          end
         end
       end
       newhash.to_json
