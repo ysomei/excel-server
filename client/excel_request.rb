@@ -8,10 +8,15 @@
 # filepath = File.expand_path("./", "B_EstimateOrder.xls")
 #
 # sheets = ExcelRequest::ExcelSheet.new
-# sheet = sheets[0]
+#
+# sheets.cloneSheet(0)
+#
+# sheet = sheets[1]
 # sheet[0, 0] = "hoge"
 # sheet[1, 9] = "日本語ですーどうですか？"
 # sheet[4, 8] = "ほがー"
+#
+# sheet[3, 2] = ["wrapping long text", ["@setWrapText", ["true"]]]
 #
 # write_filepath = File.expand_path("./", "newfile.xls")
 # ereq.get(filepath, sheets, write_filepath)
@@ -38,7 +43,7 @@ class ExcelRequest
       raise ArgumentError.new("invalid index: #{index}")
     end
 
-    def cloneSheet(index, name = nil)
+    def cloneSheet(index)
       @sheets[-1] = Array.new unless @sheets.key?(-1)
       @sheets[-1].push(["@cloneSheet", [index]])
     end

@@ -102,6 +102,15 @@ class ExcelWorkbook
     @book.setActiveSheet(index)
   end
 
+  def setWrapText(row, col, val)
+    cellstyle = @book.createCellStyle
+    cellstyle.setWrapText(val)
+    
+    return false if (cell = get_cell(row, col)).nil?
+    cell.setCellStyle(cellstyle)
+    return true
+  end
+
   private
 
   def get_cell(row, col)

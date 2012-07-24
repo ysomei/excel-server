@@ -45,7 +45,24 @@ class ExcelServer
             book.select_sheet_at(idx.to_i)
             val.each do |data|
               row, col, val = data
-              book[row, col] = val
+              case val.class.to_s
+              when "Array" # -> ["value", ["@command", ["params"]], ...]
+                v = val.shift
+                val.each do |cmds|
+                  cmd, params = cmds
+                  cmd.gsub!("@", "")
+                  params.unshift(col)
+                  params.unshift(row)
+                  begin
+                    book.send(cmd, *params)
+                  rescue
+                    p $!
+                  end
+                end
+                book[row, col] = v              
+              else
+                book[row, col] = val
+              end
             end
           end
         end
